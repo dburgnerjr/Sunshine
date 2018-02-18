@@ -19,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        mWeatherDisplay = (TextView) findViewById(R.id.tv_weather_data);
+        mWeatherDisplay = (TextView) findViewById(R.id.tv_display_weather);
         Intent intent = getIntent();
 
         if (intent != null) {
