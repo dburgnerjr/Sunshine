@@ -2,7 +2,9 @@ package com.example.android.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +28,8 @@ import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity
-        implements ForecastAdapter.ForecastAdapterOnClickHandler, LoaderCallbacks<String []> {
+        implements ForecastAdapter.ForecastAdapterOnClickHandler,
+        LoaderCallbacks<String[]>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity
     private ProgressBar mLoadingIndicator;
 
     private static final int FORECAST_LOADER_ID = 0;
+
+    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +141,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void openLocationInMap() {
-        String addressString = "1600 Ampitheatre Parkway, CA";
+        String addressString = SunshinePreferences.getPreferredWeatherLocation(this);
         Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -147,8 +152,37 @@ public class MainActivity extends AppCompatActivity
         } else {
             Log.d(TAG, "Couldn't call " + geoLocation.toString()
                     + ", no receiving apps installed!");
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                    .registerOnSharedPreferenceChangeListener(this);
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (PREFERENCES_HAVE_BEEN_UPDATED) {
+            Log.d(TAG, "onStart: preferences were updated");
+            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+            PREFERENCES_HAVE_BEEN_UPDATED = false;
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                PREFERENCES_HAVE_BEEN_UPDATED = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+                super.onDestroy();
+
+        /* Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks. */
+        PreferenceManager.getDefaultSharedPreferences(this)
+                                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
 
     @Override
     public void onClick(String weatherForDay) {
@@ -176,6 +210,12 @@ public class MainActivity extends AppCompatActivity
 
         if (menuItemThatWasSelected == R.id.action_map) {
             openLocationInMap();
+            return true;
+        }
+
+        if (menuItemThatWasSelected == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
