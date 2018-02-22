@@ -17,12 +17,17 @@
 package com.example.android.sunshine.data;
 
 import android.provider.BaseColumns;
+import android.net.Uri;
 
 /**
  * Defines table and column names for the weather database. This class is not necessary, but keeps
  * the code organized.
  */
 public class WeatherContract {
+
+    public static final String CONTENT_AUTHORITY = "com.example.android.sunshine";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final String PATH_WEATHER = "weather";
 
     public static final class WeatherEntry implements BaseColumns {
         public static final String TABLE_NAME = "weather";
