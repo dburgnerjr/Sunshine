@@ -19,6 +19,8 @@ package com.example.android.sunshine.data;
 import android.provider.BaseColumns;
 import android.net.Uri;
 
+import com.example.android.sunshine.utilities.SunshineDateUtils;
+
 /**
  * Defines table and column names for the weather database. This class is not necessary, but keeps
  * the code organized.
@@ -30,6 +32,11 @@ public class WeatherContract {
     public static final String PATH_WEATHER = "weather";
 
     public static final class WeatherEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_WEATHER)
+                .build();
+
         public static final String TABLE_NAME = "weather";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_WEATHER_ID = "weather_id";
@@ -39,6 +46,18 @@ public class WeatherContract {
         public static final String COLUMN_PRESSURE = "pressure";
         public static final String COLUMN_WIND_SPEED = "wind";
         public static final String COLUMN_DEGREES = "degrees";
+
+        public static Uri buildWeatherUriWithDate(long date) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(date))
+                    .build();
+        }
+
+        public static String getSqlSelectForTodayOnwards() {
+            long normalizedUtcNow = SunshineDateUtils.normalizeDate(System.currentTimeMillis());
+            return WeatherContract.WeatherEntry.COLUMN_DATE + " >= " + normalizedUtcNow;
+        }
     }
+
 
 }
