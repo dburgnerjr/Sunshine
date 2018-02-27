@@ -18,7 +18,6 @@ import com.example.android.sunshine.utilities.SunshineWeatherUtils;
  */
 class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder> {
 
-    //  TODO (1) Declare a private final Context field called mContext
     private Context mContext = null;
 
 
@@ -37,9 +36,8 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
         void onClick(long date);
     }
 
-    //  TODO (2) Declare a private Cursor field called mCursor
     private Cursor mCursor;
-    //  TODO (3) Add a Context field to the constructor and store that context in mContext
+
     public ForecastAdapter(@NonNull Context context, ForecastAdapterOnClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
